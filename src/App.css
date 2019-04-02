@@ -22,7 +22,18 @@
 .App-link {
   color: #61dafb;
 }
-
+.degree{
+  border-radius:25%;
+  position: absolute;
+	top: 60%; left: 50%;
+	-webkit-transform: translate3d( -50%, -50%, 0 );
+	transform: translate3d( -50%, -50%, 0 );
+  border: 1px solid black;
+  padding:25px;
+}
+.degree:hover{
+  cursor:pointer;
+}
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
