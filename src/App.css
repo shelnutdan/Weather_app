@@ -1,7 +1,35 @@
 .App {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+
+}
+header{
+  width:100%;
+}
+.weatherInputs{
+  width:100%;
+  justify-content:center;
+  margin-top: 50px;
+}
+.weatherInputs label{
+  margin: 25px;
 }
 
+.weatherDisplay{
+  width:100%;
+  margin-top: 25px;
+  padding: 25px 0px ;
+  justify-content: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  background-color: rgba(1,12,15,0.2);
+}
+.individualDays{
+  width:30%;
+  align-items: baseline;
+}
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
   height: 40vmin;
@@ -21,24 +49,4 @@
 
 .App-link {
   color: #61dafb;
-}
-.degree{
-  border-radius:25%;
-  position: absolute;
-	
-	-webkit-transform: translate3d( -50%, -50%, 0 );
-	transform: translate3d( -50%, -50%, 0 );
-  border: 1px solid black;
-  padding:25px;
-}
-.degree:hover{
-  cursor:pointer;
-}
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }

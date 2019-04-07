@@ -6,67 +6,62 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state={
-      error: null,
-      zipcode:0,
-      temperature:0,
-      forecast:[],
-      location:'',
-      icon:'',
-      weather:'',
-      date:"2017-06-01",
-      isLoaded:false,
       isChecked:true,
-      oneDay:false,
-      fiveDay:false
+      forecast:[],
+      error: null,
+      zipcode:0
+
     }
     this.handleChange=this.handleChange.bind(this);
     this.handleSubmit=this.handleSubmit.bind(this);
     this.toggleChange=this.toggleChange.bind(this);
-    this.handleDate=this.handleDate.bind(this);
     this.todaysForecast=this.todaysForecast.bind(this);
-    this.fiveDayForecast=this.fiveDayForecast.bind(this)
+    this.fiveDayForecast=this.fiveDayForecast.bind(this);
+    this.handledate=this.handledate.bind(this)
   }
 
   handleSubmit(event){
     event.preventDefault();
-    const zipcode=this.state.zipcode
+    const zipcode=this.state.zipcode;
+    this.setState({ forecast: [] });
     console.log(zipcode);
     if(this.state.oneDay){
       fetch(`https://api.openweathermap.org/data/2.5/weather?zip=${zipcode},us&APPID=fc20bc99a527278382bcc31e4b774425`).then(response=>response.json()).then(
         (data)=>{
           console.log(data)
+          this.setState(prevState =>{
+            return (
+              {
+                forecast: [...prevState.forecast,data]
+              }
+            )
+          })
+          /*
           this.setState({
           temperature: (data.main.temp-273.15).toFixed(1),
           location: data.name,
           weather: data.weather[0].main,
-          icon: `http://openweathermap.org/img/w/${data.weather[0].icon}.png`
-      })
+          icon: `http://openweathermap.org/img/w/${data.weather[0].icon}.png`*/
+          console.log(this.state.forecast)
     }).catch( error=> console.log('Parsing error',error))
-      console.log('Entered in a zip-code',this.state.zipcode, "For this location of", this.state.location ,"For this date",this.state.date)
     }
 
     else if( this.state.fiveDay){
       fetch(`https://api.openweathermap.org/data/2.5/forecast?zip=${zipcode},us&APPID=fc20bc99a527278382bcc31e4b774425`).then(response=>response.json()).then(
         (data)=>{
-          let dateArray=[]
-          let tempArray=[];
-          let weatherArray=[];
-          let iconArray=[]
-          let list=data.list
-
+        let list=data.list
 
         for (let i=0;i<list.length;i+=8){
+          this.setState(prevState =>{
+            return (
+              {
+                forecast: [...prevState.forecast,data.list[i]]
+              }
+            )
+          })
           console.log(list[i])
-          dateArray.push(list[i].dt_txt)
-            tempArray.push(list[i].main.temp)
-              weatherArray.push(list[i].weather[0].main)
-              iconArray.push(list[i].weather[0].icon)
         }
-        console.log(dateArray)
-        console.log(tempArray);
-        console.log(weatherArray);
-        console.log(iconArray);
-          console.log(list)
+
         }
       ).catch( error=> console.log('Parsing error',error))
     }else{
@@ -81,12 +76,14 @@ class App extends Component {
     //console.log(event.target);
    this.setState({ [event.target.name]: event.target.value});
  }
-
+handledate(date){
+  let d=new Date(date*1000);
+  //let ds=d.toString("MMM dd yy");
+  let ds= (d.getMonth()+1)+"/"+ d.getDate()+"/"+d.getFullYear()
+  return ds;
+}
  toggleChange(){
    this.setState({isChecked: !this.state.isChecked})
- }
- handleDate(){
-   this.setState({date: this.state.date})
  }
  todaysForecast(){
    this.setState(
@@ -110,37 +107,43 @@ class App extends Component {
  }
 
   render() {
-
+      var testRender=[{id:1,test:this.state.date},{id:2,test:200}]
       return (
         <div className="App">
+        <header>
           <h1>Welcome to the Weather Forecaster!</h1>
-          <p>Just enter in your locoation what type of forecast you want</p>
+          <p>Just enter in your locoation what type of forecast you want</p></header>
           <div className='weatherInputs'>
-          <form onSubmit={this.handleSubmit}>
-            <label>Zip-Code:
-              <input type='number' name='zipcode' value={this.state.value} onChange={this.handleChange}/>
-            </label>
+            <form onSubmit={this.handleSubmit}>
+              <label>Zip-Code:
+                <input type='number' name='zipcode' value={this.state.value} onChange={this.handleChange}/>
+              </label>
+              <br/>
 
-            <br/>
-            {/*Forecast options*/}
-            <input type='checkbox' name='forecast_length' value=' 1 day' onClick={this.todaysForecast} />Todays forecast
-            <input type='checkbox' name='forecast_length' value=' 5 day' onClick={this.fiveDayForecast}/>Next Five Days<br/>
-            <label>
-            Choose Temperature unit:
-            <input type='radio' name='temperature_unit' value='fahernheight' onClick={(e)=>console.log(e.target.value)} />&deg; F
-            <input type='radio' name='temperature_unit' value='celculius ' onClick={(e)=>console.log(e.target.value)}/>&deg; C<br/>
-            </label><br/>
-            <input type='submit' value='Submit'/>
-          </form>
-          <div className='degree' onClick={ this.toggleChange}>
-            {this.state.isChecked ? <span>&deg; F</span>:<span> &deg; C</span>}
-          </div>
+              <input type='checkbox' name='forecast_length' value=' 1 day' onClick={this.todaysForecast} />Todays forecast
+              <input type='checkbox' name='forecast_length' value=' 5 day' onClick={this.fiveDayForecast}/>Next Five Days<br/>
+              <label>
+              Choose Temperature unit:
+              <input type='radio' name='temperature_unit' value='fahernheight' onChange={this.toggleChange} checked={this.state.isChecked}/>&deg; F
+              <input type='radio' name='temperature_unit' value='celculius ' onChange={this.toggleChange}/>&deg; C<br/>
+              </label><br/>
+              <input type='submit' value='Submit'/>
+            </form>
           </div>
           <div className='weatherDisplay'>
-          <img src={this.state.icon}/>
-            <p>Temperature: {this.state.isChecked ? <span>{this.state.temperature*(9/5)+32}&deg; F</span>:<span> {this.state.temperature}&deg; C</span>} </p>
-            <p>Location: {this.state.location}</p>
-            <p>Weather: {this.state.weather}</p>
+          {this.state.forecast.map( e =>
+            <div className='individualDays'>
+            <img
+            src={`http://openweathermap.org/img/w/${e.weather[0].icon}.png`}
+            />
+              <p>Day: {this.handledate(e.dt)}</p>
+              <p>Temperature: {this.state.isChecked ?
+                <span>{((e.main.temp-273.15)*(9/5)+32).toFixed(0)}&deg; F</span>:
+                <span> {(e.main.temp-273.15).toFixed(0)}&deg; C</span>}
+              </p>
+              <p>Weather: {e.weather[0].main}</p>
+            </div>
+          )}
           </div>
         </div>
       );
